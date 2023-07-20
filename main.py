@@ -1,8 +1,6 @@
 from flask import Flask, request, jsonify
 import openai
 import os
-import nltk
-from nltk.tokenize import sent_tokenize
 
 nltk.download("punkt")
 
