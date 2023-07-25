@@ -17,31 +17,27 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 @app.route('/task/<action>', methods=['POST'])
-def upload_files(action):
+def upload_file(action):
     if 'file' not in request.files:
         return 'No file part in the request', 400
 
-    files = request.files.getlist('file')
-    results = []
+    file = request.files['file']
 
-    for file in files:
-        if file.filename == '':
-            return 'No file selected for uploading', 400
+    if file.filename == '':
+        return 'No file selected for uploading', 400
 
-        save_path = os.path.join('./tmp', file.filename)
-        file.save(save_path)
+    save_path = os.path.join('./tmp', file.filename)
+    file.save(save_path)
 
-        res_upload_clean = upload_clean(save_path)
-        res_clean_file = clean_file(res_upload_clean)
+    res_upload_clean = upload_clean(save_path)
+    res_clean_file = clean_file(res_upload_clean)
 
-        if action == 'upload_clean':
-            results.append(jsonify(response=res_upload_clean, status=200))
-        elif action == 'clean_file':
-            results.append(jsonify(response=res_clean_file, status=200))
-        else:
-            return "Action not found", 404
-
-    return jsonify(results)
+    if action == 'upload_clean':
+        return jsonify(response=res_upload_clean, status=200)
+    elif action == 'clean_file':
+        return jsonify(response=res_clean_file, status=200)
+    else:
+        return "Action not found", 404
 
 
 def split_text(text, chunk_size):
@@ -57,10 +53,10 @@ def split_text(text, chunk_size):
 
 
 def upload_clean(file_path):
-    with open(file_path, 'r', encoding='iso-8859-1') as f:
+    with open(file_path, 'r') as f:
         file_content = f.read()
 
-    chunk_size = 500
+    chunk_size = 1000
     text_chunks = split_text(file_content, chunk_size)
 
     gpt_responses = []
@@ -100,7 +96,7 @@ def clean_file(response):
                 "content": "You are a professional terminologist. Your job is to clean a list of terms keeping "
                            "only essential and important terms from a given list of terms"
                            "Make sure to return them as json format {'cleaned_terms': [term1, term2 ...]} to be parsed"
-                           " in the frontend, limit yourself to 5 terms "
+                           " in the frontend limit yourself to 5 terms by given file"
             },
             {
                 "role": "user",
@@ -108,7 +104,7 @@ def clean_file(response):
             }
         ],
         temperature=0.6,
-        max_tokens=100,
+        max_tokens=300,
         top_p=0.95,
         frequency_penalty=0,
         presence_penalty=0,
@@ -116,7 +112,7 @@ def clean_file(response):
     )
     print(response.choices[0]['message']['content'])
     res = json.loads(response.choices[0]['message']['content'])
-    return jsonify(response=res, status=200)
+    return res
 
 
 if __name__ == '__main__':
