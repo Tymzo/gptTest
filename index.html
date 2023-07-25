@@ -13,11 +13,14 @@
     <form id="uploadForm" onsubmit="uploadFiles(event)" enctype="multipart/form-data">
         <label for="file">Sélectionnez le ou les fichiers à télécharger :</label>
         <input type="file" name="file" id="file" multiple>
+                <br>
         <label for="endpointSelect">Sélectionnez un endpoint :</label>
         <select id="endpointSelect" name="endpoint">
             <option value="upload_clean">Upload and clean a file</option>
             <option value="clean_file">Clean a file</option>
         </select>
+                <br>
+
         <input type="submit" value="Télécharger">
     </form>
     <h2>Résultat :</h2>
