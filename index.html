@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fichier de téléchargement</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        function uploadFiles(event) {
+            event.preventDefault();
+
+            const form = document.getElementById('uploadForm');
+            const formData = new FormData(form);
+            const endpointSelect = document.getElementById('endpointSelect');
+            const selectedEndpoint = endpointSelect.value;
+
+            fetch(`http://localhost:8000/${selectedEndpoint}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultElement = document.getElementById('result');
+                const resultText = JSON.stringify(data, null, 2);
+                resultElement.innerHTML = resultText;
+
+                // Create a downloadable text file
+                const textFileBlob = new Blob([resultText], {type: 'text/plain'});
+                const downloadLink = document.createElement('a');
+                downloadLink.href = URL.createObjectURL(textFileBlob);
+                downloadLink.download = 'response.txt';
+                downloadLink.textContent = 'Télécharger la réponse en format .txt';
+                resultElement.appendChild(downloadLink);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Télécharger des fichiers</h1>
+        <form id="uploadForm" onsubmit="uploadFiles(event)" enctype="multipart/form-data">
+            <label for="file">Sélectionnez les fichiers à télécharger :</label>
+            <input type="file" name="file" id="file" multiple>
+            <label for="endpointSelect">Sélectionnez un endpoint :</label>
+            <select id="endpointSelect" name="endpoint">
+                <option value="task/upload_clean">Upload and clean a file</option>
+                <option value="task/clean_file">Clean a file</option>
+            </select>
+            <input type="submit" value="Télécharger">
+        </form>
+        <h2>Résultat :</h2>
+        <pre id="result"></pre>
+    </div>
+</body>
+</html>
