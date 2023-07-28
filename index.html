@@ -2,30 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fichier de téléchargement</title>
+    <title>Upload and Clean files</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container">
-    <h1>Télécharger des fichiers</h1>
-    <form id="uploadForm" onsubmit="uploadFiles(event)" enctype="multipart/form-data">
-        <label for="file">Sélectionnez le ou les fichiers à télécharger :</label>
-        <input type="file" name="file" id="file" multiple>
-                <br>
-        <label for="endpointSelect">Sélectionnez un endpoint :</label>
-        <select id="endpointSelect" name="endpoint">
-            <option value="upload_clean">Upload and clean a file</option>
-            <option value="clean_file">Clean a file</option>
+    <div class="container">
+        <h1>LogiTerm de l'ITU</h1>
+        <input type="file" id="fileInput" multiple />
+        <select id="actionSelect">
+            <option value="upload_clean">Upload Clean</option>
+            <option value="clean_file">Clean File</option>
         </select>
-                <br>
-
-        <input type="submit" value="Télécharger">
-    </form>
-    <h2>Résultat :</h2>
-    <pre id="result"></pre>
-</div>
-<script src="script.js"></script>
+        <button id="uploadButton">Envoyer les fichiers</button>
+        <div id="result">
+            <h2>Résultat :</h2>
+            <pre id="apiResponse"></pre>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
 </body>
 </html>
