@@ -21,12 +21,15 @@
         </select>
     </p>
     <button id="uploadButton">Envoyer le fichier</button>
+    <div id="loadingSpinner" style="display: none;">
+        <img src="img/Loading_icon.gif" alt="Chargement..." />
+    </div>
     <div id="result">
         <h2>Résultat :</h2>
         <pre id="apiResponse"></pre>
     </div>
-
-    <script src="scripts.js"></script>
+    <button id="downloadButton" type="button">Télécharger le résultat</button>
 </div>
+<script src="scripts.js"></script>
 </body>
 </html>

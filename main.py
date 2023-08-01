@@ -69,22 +69,25 @@ def upload_clean(file_path):
                 {
                     "role": "system",
                     "content": f"You are a professional terminologist. Your job is to extract important terms from a"
-                               f" given text. limit yourself to 5 terms per a given text"
-                               f"Make sure to return them as a list of terms highly sophisticated terms numbered consecutively"
+                               f" given text. limit yourself to 7 terms per a given text"
+                               f"Make sure to return them as a list of terms without numbering them."
                 },
                 {
                     "role": "user",
                     "content": chunk
                 }
             ],
-            temperature=0.7,
+            temperature=0.6,
             max_tokens=50,
             top_p=0.95,
             frequency_penalty=0,
             presence_penalty=0,
             stop=None
         )
-        gpt_response = response.choices[0]['message']['content']
+
+        cleaned_response = response.choices[0]['message']['content'].replace('\n', '').split('. ')[1:]
+        cleaned_terms = [term.strip() for term in cleaned_response]
+        gpt_responses.extend(cleaned_terms)
     return gpt_responses
 
 
@@ -96,9 +99,9 @@ def clean_file(response):
             {
                 "role": "system",
                 "content": "You are a professional terminologist. Your job is to clean a list of terms keeping "
-                           "only essential and important terms from a given list of terms"
+                           "only essential and important terms from a given list of terms, limit yourself to 20 cleaned temrs"
                            "Make sure to return them as json format {'cleaned_terms': [term1, term2 ...]} to be parsed"
-                           " in the frontend limit yourself to 5 terms by given file but do not numerate them like  '1. Exemple, 2. Exemple2 3. Exemple3...'"
+
             },
             {
                 "role": "user",
@@ -112,11 +115,9 @@ def clean_file(response):
         presence_penalty=0,
         stop=None
     )
-
-    print("Response:", response)
-    print("Content to load as JSON:", response.choices[0]['message']['content'])
-
-    res = response.choices[0]['message']['content']
+    print(response.choices[0]['message']['content'])
+    res = json.loads(response.choices[0]['message']['content'])
+    print("JSON response:", res)
     return res
 
 
