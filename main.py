@@ -2,11 +2,13 @@ from flask import Flask, request, jsonify
 import openai
 import os
 import json
+from flask_cors import CORS
 
-os.environ["REQUESTS_CA_BUNDLE"] = 'C:\\Users\\antonije\\Downloads\\ITU_Root_Authority.crt'
-os.environ["SSL_CERT_FILE"] = 'C:\\Users\\antonije\\Downloads\\ITU_Root_Authority.crt'
+# os.environ["REQUESTS_CA_BUNDLE"] = 'C:\\Users\\antonije\\Downloads\\ITU_Root_Authority.crt'
+# os.environ["SSL_CERT_FILE"] = 'C:\\Users\\antonije\\Downloads\\ITU_Root_Authority.crt'
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:63342"])
 
 os.environ["OPENAI_API_KEY"] = "023660028984431ba43b6df026a3170f"
 
@@ -68,21 +70,21 @@ def upload_clean(file_path):
                     "role": "system",
                     "content": f"You are a professional terminologist. Your job is to extract important terms from a"
                                f" given text. limit yourself to 5 terms per a given text"
-                               f"Make sure to return them as a list of terms highly sophisticated"
+                               f"Make sure to return them as a list of terms highly sophisticated terms numbered consecutively"
                 },
                 {
                     "role": "user",
                     "content": chunk
                 }
             ],
-            temperature=0.6,
+            temperature=0.7,
             max_tokens=50,
             top_p=0.95,
             frequency_penalty=0,
             presence_penalty=0,
             stop=None
         )
-        gpt_responses.append(response.choices[0]['message']['content'])
+        gpt_response = response.choices[0]['message']['content']
     return gpt_responses
 
 
@@ -96,22 +98,25 @@ def clean_file(response):
                 "content": "You are a professional terminologist. Your job is to clean a list of terms keeping "
                            "only essential and important terms from a given list of terms"
                            "Make sure to return them as json format {'cleaned_terms': [term1, term2 ...]} to be parsed"
-                           " in the frontend limit yourself to 5 terms by given file"
+                           " in the frontend limit yourself to 5 terms by given file but do not numerate them like  '1. Exemple, 2. Exemple2 3. Exemple3...'"
             },
             {
                 "role": "user",
                 "content": to_clean
             }
         ],
-        temperature=0.6,
+        temperature=0.7,
         max_tokens=300,
         top_p=0.95,
         frequency_penalty=0,
         presence_penalty=0,
         stop=None
     )
-    print(response.choices[0]['message']['content'])
-    res = json.loads(response.choices[0]['message']['content'])
+
+    print("Response:", response)
+    print("Content to load as JSON:", response.choices[0]['message']['content'])
+
+    res = response.choices[0]['message']['content']
     return res
 
 

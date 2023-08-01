@@ -1,21 +1,25 @@
-document.getElementById("uploadButton").addEventListener("click", function () {
+document.getElementById("uploadButton").addEventListener("click", uploadFile);
+
+function uploadFile() {
     const fileInput = document.getElementById("fileInput");
-    const files = fileInput.files;
+    const file = fileInput.files[0];
     const actionSelect = document.getElementById("actionSelect");
     const selectedAction = actionSelect.value;
 
-    if (files.length === 0) {
-        alert("Veuillez choisir au moins un fichier à télécharger.");
+    if (!file) {
+        alert("Veuillez choisir un fichier à télécharger.");
         return;
     }
 
     const formData = new FormData();
+    formData.append("file", file);
 
-    for (const file of files) {
-        formData.append("files[]", file);
-    }
+    // Modifiez l'URL en fonction de l'action sélectionnée
+    const apiUrl = selectedAction === "upload_clean" ?
+        "http://localhost:8000/task/upload_clean" :
+        "http://localhost:8000/task/clean_file";
 
-    fetch(`http://localhost:8000/task/${selectedAction}`, {
+    fetch(apiUrl, {
         method: "POST",
         body: formData,
     })
@@ -23,13 +27,34 @@ document.getElementById("uploadButton").addEventListener("click", function () {
         .then((data) => {
             if (data.status === 200) {
                 console.log(data.response);
-                document.getElementById("apiResponse").textContent = JSON.stringify(data.response, null, 2);
+                const resultList = document.getElementById("apiResponse");
+                resultList.innerHTML = ""; // Efface le contenu précédent
+
+                const list = document.createElement("ul");
+
+                if (selectedAction === "upload_clean") {
+                    // Traitez la réponse pour l'action upload_clean
+                    data.response.forEach((item) => {
+                        const terms = item.split('\n');
+                        terms.forEach((term) => {
+                            const listItem = document.createElement("li");
+                            listItem.textContent = term;
+                            list.appendChild(listItem);
+                        });
+                    });
+                } else if (selectedAction === "clean_file") {
+                    // Traitez la réponse pour l'action clean_file
+                    const cleanedTerms = data.response.cleaned_terms;
+                    cleanedTerms.forEach((term) => {
+                        const listItem = document.createElement("li");
+                        listItem.textContent = term;
+                        list.appendChild(listItem);
+                    });
+                }
+
+                resultList.appendChild(list);
             } else {
-                alert("Une erreur s'est produite lors de l'envoi des fichiers.");
+                alert("Une erreur s'est produite lors de l'envoi du fichier.");
             }
-        })
-        .catch((error) => {
-            console.error("Erreur :", error);
-            alert("Une erreur s'est produite lors de l'envoi des fichiers.");
         });
-});  
+}

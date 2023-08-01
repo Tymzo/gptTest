@@ -7,19 +7,26 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>LogiTerm</h1>
-        <input type="file" id="fileInput" multiple />
+<div class="container">
+    <h1>LogiTerm</h1>
+    <p>
+        <label for="fileInput">Sélectionnez le fichier à traiter :</label>
+        <input type="file" id="fileInput"/>
+    </p>
+    <p>
+        <label for="actionSelect">Choisissez une action :</label>
         <select id="actionSelect">
-            <option value="upload_clean">Upload Clean</option>
-            <option value="clean_file">Clean File</option>
+            <option value="upload_clean">Extraire les terms d'un document</option>
+            <option value="clean_file">Nettoyer un fichier fournit par LogiTerm</option>
         </select>
-        <button id="uploadButton">Envoyer les fichiers</button>
-        <div id="result">
-            <h2>Résultat :</h2>
-            <pre id="apiResponse"></pre>
-        </div>
+    </p>
+    <button id="uploadButton">Envoyer le fichier</button>
+    <div id="result">
+        <h2>Résultat :</h2>
+        <pre id="apiResponse"></pre>
     </div>
+
     <script src="scripts.js"></script>
+</div>
 </body>
 </html>
