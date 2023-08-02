@@ -55,7 +55,7 @@ def split_text(text, chunk_size):
 
 
 def upload_clean(file_path):
-    with open(file_path, 'r') as f:
+    with open(file_path, 'r', encoding='utf-8') as f:
         file_content = f.read()
 
     chunk_size = 1000
