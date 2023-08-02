@@ -1,11 +1,11 @@
-document.getElementById("uploadButton").addEventListener("click", function() {
-    var selectedAction = document.getElementById("actionSelect").value;
-    if (selectedAction === "upload_clean" || selectedAction === "clean_file") {
-        uploadFile(selectedAction);
-    }
+document.getElementById("uploadButton").addEventListener("click", function () {
+    uploadFile();
 });
 
-document.getElementById("compareButton").addEventListener("click", compareFiles);
+document.getElementById("compareButton").addEventListener("click", function () {
+    compareFiles();
+});
+
 
 function readFileContent(file) {
     return new Promise((resolve, reject) => {
@@ -19,8 +19,6 @@ function readFileContent(file) {
 async function uploadFile() {
     const fileInput = document.getElementById("fileInput");
     const file = fileInput.files[0];
-    const actionSelect = document.getElementById("actionSelect");
-    const selectedAction = actionSelect.value;
 
     if (!file) {
         alert("Veuillez choisir un fichier à télécharger.");
@@ -30,11 +28,14 @@ async function uploadFile() {
     const formData = new FormData();
     formData.append("file", file);
 
+    const actionSelect = document.getElementById("actionSelect");
+    const selectedAction = actionSelect.value;
+
     const apiUrl = selectedAction === "upload_clean" ?
         "http://localhost:8000/task/upload_clean" :
         "http://localhost:8000/task/clean_file";
 
-    document.getElementById("loadingSpinner").style.display = "block";
+    document.getElementById("loadingSpinner").style.display = "inline-block";
 
     fetch(apiUrl, {
         method: "POST",
@@ -47,6 +48,8 @@ async function uploadFile() {
             if (data.status === 200) {
                 console.log("API response:", data.response);
                 const resultList = document.getElementById("apiResponse");
+                const downloadButton = document.getElementById("downloadButton");
+
                 resultList.innerHTML = "";
 
                 const list = document.createElement("ol");
@@ -71,7 +74,7 @@ async function uploadFile() {
                         list.appendChild(listItem);
                     });
                 }
-
+                downloadButton.classList.remove("btn-disabled");
                 resultList.appendChild(list);
             } else {
                 alert("Une erreur s'est produite lors de l'envoi du fichier.");
@@ -102,8 +105,8 @@ async function uploadFile() {
 }
 
 function compareFiles() {
-    const resultFileInput = document.getElementById("resultFileInput");
-    const compareFileInput = document.getElementById("compareFileInput");
+    const resultFileInput = document.getElementById("compareFileInput1"); // Modification ici
+    const compareFileInput = document.getElementById("compareFileInput2"); // Modification ici
 
     if (!resultFileInput.files[0] || !compareFileInput.files[0]) {
         alert("Veuillez sélectionner les deux fichiers à comparer.");
@@ -122,18 +125,27 @@ function compareFiles() {
 }
 
 function displayComparisonResults(resultFileContent, compareFileContent) {
-    // Créez un objet DiffMatchPatch
-    var dmp = new diff_match_patch();
+    const resultLines = resultFileContent.split('\n');
+    const compareLines = compareFileContent.split('\n');
 
-    // Calculez les différences entre les deux fichiers
-    var diffs = dmp.diff_main(resultFileContent, compareFileContent);
+    const resultContainer = document.getElementById("comparisonResult");
+    resultContainer.classList.remove('hidden')
+    resultContainer.innerHTML = "";
 
-    // Appliquez un surlignage en jaune pour les termes similaires
-    dmp.diff_cleanupSemantic(diffs);
+    const list = document.createElement("ul");
 
-    // Générez le code HTML pour afficher les différences
-    var html = dmp.diff_prettyHtml(diffs);
+    resultLines.forEach((line, index) => {
+        const listItem = document.createElement("li");
+        listItem.textContent = line;
 
-    // Insérez le code HTML dans les éléments <div> appropriés
-    document.getElementById("file1").innerHTML = html;
+        if (line !== compareLines[index]) {
+            listItem.style.color = "red";
+        }
+
+        list.appendChild(listItem);
+    });
+
+    resultContainer.appendChild(list);
 }
+
+

@@ -1,55 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="cmyk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload and Clean files</title>
+    <title>Extract and Compare terms</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.0/dist/full.css" rel="stylesheet" type="text/css"/>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
+
 <div class="container">
-    <h1>LogiTerm</h1>
-    <p>
-        <label for="fileInput">Sélectionnez le fichier à traiter :</label>
-        <input type="file" id="fileInput"/>
-    </p>
-    <p>
-        <label for="actionSelect">Choisissez une action :</label>
-        <select id="actionSelect">
-            <option value="upload_clean">Extraire les termes d'un document</option>
-            <option value="clean_file">Nettoyer un fichier fourni par LogiTerm</option>
+    <h1 class="mb-3 title">Tymzer</h1>
+    <hr>
+    <h1 class="text-center font-bold mt-3 mb-3">Traitement des fichiers</h1>
+
+    <div class="text-center">
+        <input type="file" id="fileInput" class="file-input w-full max-w-sm" />
+        <select class="select select-bordered w-full max-w-xs" id="actionSelect">
+            <option disabled selected>Choisissez une action</option>
+            <option value="upload_clean">Extraire les terms d'un document</option>
+            <option value="clean_file">Nettoyer un fichier fournit par LogiTerm</option>
         </select>
-    </p>
-    <button id="uploadButton">Effectuer l'action</button>
-    <div id="loadingSpinner" style="display: none;">
-        <img src="img/Loading_icon.gif" alt="Chargement..."/>
+        <br>
+        <button class="btn w-64 rounded-full mt-5 mb-5" id="uploadButton">Envoyer le fichier</button>
+        <br>
+        <span id="loadingSpinner" class="loading loading-ball loading-lg"></span>
+        <pre id="apiResponse" class="mb-3"></pre>
+        <button class="btn w-64 rounded-full btn-disabled" id="downloadButton">Télécharger le résultat</button>
     </div>
-    <div id="result">
-        <h2>Résultat :</h2>
-        <pre id="apiResponse"></pre>
+
+    <hr class="mt-3 mb-3">
+
+    <div class="text-center">
+        <h1 class="text-center font-bold mt-3 mb-3">Comparer les fichiers</h1>
+        <input type="file" id="compareFileInput1" class="file-input w-full max-w-sm"/>
+        <input type="file" id="compareFileInput2" class="file-input w-full max-w-sm" />
+        <button class="btn w-64 rounded-full" id="compareButton" onclick="compareFiles()">Comparer les fichiers</button>
+
+        <div class="hidden mt-3" id="comparisonResult"></div>
     </div>
-    <button id="downloadButton" type="button">Télécharger le résultat</button>
 </div>
-<div class="container2">
 
-    <div>
-        <h2>Fichier résultat </h2>
-        <input type="file" id="resultFileInput">
-
-        <h2>Fichier à comparer </h2>
-        <input type="file" id="compareFileInput">
-        <button id="compareButton">Comparer les fichiers</button>
-    </div>
-
-    <div class="comparison-results">
-        <h2>Résultats de la comparaison</h2>
-        <div class="comparison-lists">
-            <div id="file1" class="file-content"></div>
-            <div id="file2" class="file-content"></div>
-        </div>
-    </div>
-
-</div>
 <script src="scripts.js"></script>
 </body>
 </html>
