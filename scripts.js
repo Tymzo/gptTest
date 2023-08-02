@@ -1,5 +1,11 @@
-document.getElementById("uploadButton").addEventListener("click", uploadFile);
-// document.getElementById("compareButton").addEventListener("click", compareDocuments);
+document.getElementById("uploadButton").addEventListener("click", function() {
+    var selectedAction = document.getElementById("actionSelect").value;
+    if (selectedAction === "upload_clean" || selectedAction === "clean_file") {
+        uploadFile(selectedAction);
+    }
+});
+
+document.getElementById("compareButton").addEventListener("click", compareFiles);
 
 function readFileContent(file) {
     return new Promise((resolve, reject) => {
@@ -8,10 +14,6 @@ function readFileContent(file) {
         fileReader.onerror = error => reject(error);
         fileReader.readAsText(file);
     });
-}
-
-function compareStrings(a, b) {
-    return a.localeCompare(b);
 }
 
 async function uploadFile() {
@@ -32,7 +34,6 @@ async function uploadFile() {
         "http://localhost:8000/task/upload_clean" :
         "http://localhost:8000/task/clean_file";
 
-    // Affiche le spinner
     document.getElementById("loadingSpinner").style.display = "block";
 
     fetch(apiUrl, {
@@ -41,13 +42,12 @@ async function uploadFile() {
     })
         .then((response) => response.json())
         .then((data) => {
-            // Masque le spinner
             document.getElementById("loadingSpinner").style.display = "none";
 
             if (data.status === 200) {
                 console.log("API response:", data.response);
                 const resultList = document.getElementById("apiResponse");
-                resultList.innerHTML = ""; // Efface le contenu précédent
+                resultList.innerHTML = "";
 
                 const list = document.createElement("ol");
 
@@ -78,7 +78,6 @@ async function uploadFile() {
             }
         })
         .catch((error) => {
-            // Masque le spinner en cas d'erreur
             document.getElementById("loadingSpinner").style.display = "none";
             console.error("Erreur lors de l'envoi du fichier :", error);
         });
@@ -90,7 +89,7 @@ async function uploadFile() {
         const terms = Array.from(resultList.getElementsByTagName("li")).map(li => li.textContent);
         const termsText = terms.join('\n');
 
-        const blob = new Blob([termsText], { type: 'text/plain;charset=utf-8' });
+        const blob = new Blob([termsText], {type: 'text/plain;charset=utf-8'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = 'result.txt';
@@ -102,25 +101,39 @@ async function uploadFile() {
     }
 }
 
+function compareFiles() {
+    const resultFileInput = document.getElementById("resultFileInput");
+    const compareFileInput = document.getElementById("compareFileInput");
 
-// async function compareDocuments() {
-//     const fileInput = document.getElementById("fileInput");
-//     const file = fileInput.files[0];
-//
-//     const compareFileInput = document.getElementById("compareFileInput");
-//     const compareFile = compareFileInput.files[0];
-//
-//     if (!file || !compareFile) {
-//         alert("Veuillez choisir les deux fichiers à comparer.");
-//         return;
-//     }
-//
-//     const fileContent = await readFileContent(file);
-//     const compareFileContent = await readFileContent(compareFile);
-//
-//     const comparisonResult = compareStrings(fileContent, compareFileContent);
-//     console.log("Résultat de la comparaison :", comparisonResult);
-//
-//     const apiResponse = document.getElementById("apiResponse");
-//     apiResponse.textContent = "Résultat de la comparaison : " + comparisonResult;
-// }
+    if (!resultFileInput.files[0] || !compareFileInput.files[0]) {
+        alert("Veuillez sélectionner les deux fichiers à comparer.");
+        return;
+    }
+
+    Promise.all([
+        readFileContent(resultFileInput.files[0]),
+        readFileContent(compareFileInput.files[0]),
+    ]).then(([resultFileContent, compareFileContent]) => {
+        displayComparisonResults(resultFileContent, compareFileContent);
+    }).catch((error) => {
+        console.error("Erreur lors de la lecture des fichiers :", error);
+        alert("Une erreur s'est produite lors de la lecture des fichiers. Veuillez réessayer.");
+    });
+}
+
+function displayComparisonResults(resultFileContent, compareFileContent) {
+    // Créez un objet DiffMatchPatch
+    var dmp = new diff_match_patch();
+
+    // Calculez les différences entre les deux fichiers
+    var diffs = dmp.diff_main(resultFileContent, compareFileContent);
+
+    // Appliquez un surlignage en jaune pour les termes similaires
+    dmp.diff_cleanupSemantic(diffs);
+
+    // Générez le code HTML pour afficher les différences
+    var html = dmp.diff_prettyHtml(diffs);
+
+    // Insérez le code HTML dans les éléments <div> appropriés
+    document.getElementById("file1").innerHTML = html;
+}

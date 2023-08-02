@@ -9,7 +9,8 @@ body {
     min-height: 100vh;
 }
 
-.container {
+.container,
+.container2 {
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
@@ -17,7 +18,11 @@ body {
     background-color: #ffffff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    position: relative    ;
+    position: relative;
+}
+
+.container2 {
+    margin-top: 2rem;
 }
 
 h1 {
@@ -79,4 +84,57 @@ pre {
     position: center;
     top: 100%;
     left: 100%;
+}
+
+/* Styles ajoutés */
+.list-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.list {
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.red {
+    color: red;
+}
+
+div h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+input[type="file"] + input[type="file"] {
+    margin-top: 1rem;
+}
+
+button + button {
+    margin-top: 1rem;
+    background-color: #28a745;
+}
+
+button + button:hover {
+    background-color: #218838;
+}
+
+/* Ajoutez ces styles pour afficher les résultats côte à côte */
+.result-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.result {
+    width: calc(50% - 1rem); /* Chaque résultat prend la moitié de la largeur, en déduisant une marge */
+    margin-bottom: 2rem;
+}
+
+/* Ajoutez ce style pour rendre les conteneurs flexibles */
+@media (max-width: 768px) {
+    .result {
+        width: 100%;
+    }
 }
