@@ -32,7 +32,7 @@ def upload_file(action):
     file.save(save_path)
 
     res_upload_clean = upload_clean(save_path)
-    res_clean_file = clean_file(res_upload_clean)
+    res_clean_file = clean_file(res_upload_clean) #voir si il ne faut pas enlever le "res_upload_clean" afin de ne pas faire 2 requêtes
 
     if action == 'upload_clean':
         return jsonify(response=res_upload_clean, status=200)

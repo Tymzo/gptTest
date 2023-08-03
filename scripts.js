@@ -126,10 +126,12 @@ function compareFiles() {
             const resultTerms = resultContent.split("\n");
             const compareTerms = compareContent.split("\n");
 
-            const resultList = document.getElementById("compareResult");
+            const resultList = document.getElementById("comparaisonResult");
             resultList.innerHTML = "";
 
             const list = document.createElement("ol");
+
+            let matchingTerms = 0;
 
             resultTerms.forEach((term) => {
                 const listItem = document.createElement("li");
@@ -137,6 +139,7 @@ function compareFiles() {
 
                 if (compareTerms.includes(term)) {
                     listItem.style.color = "green";
+                    matchingTerms += 1;
                 } else {
                     listItem.style.color = "red";
                 }
@@ -145,8 +148,14 @@ function compareFiles() {
             });
 
             resultList.appendChild(list);
+
+            const similarityPercentage = (matchingTerms / resultTerms.length) * 100;
+            const similarityDisplay = document.createElement("h2");
+            similarityDisplay.textContent = `Pourcentage de similitude : ${similarityPercentage.toFixed(2)}%`;
+            resultList.appendChild(similarityDisplay);
         })
         .catch((error) => {
             console.error("Erreur lors de la lecture des fichiers :", error);
         });
 }
+
