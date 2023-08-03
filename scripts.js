@@ -123,8 +123,10 @@ function compareFiles() {
         readFileContent(compareFileInput.files[0]),
     ])
         .then(([resultContent, compareContent]) => {
-            const resultTerms = resultContent.split("\n");
-            const compareTerms = compareContent.split("\n");
+            const resultTerms = resultContent.split("\n")
+                .map(term => term.toLowerCase().trim());
+            const compareTerms = compareContent.split("\n")
+                .map(term => term.toLowerCase().trim());
 
             const resultList = document.getElementById("comparaisonResult");
             resultList.innerHTML = "";
@@ -158,4 +160,3 @@ function compareFiles() {
             console.error("Erreur lors de la lecture des fichiers :", error);
         });
 }
-

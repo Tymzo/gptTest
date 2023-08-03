@@ -1,14 +1,17 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
+
 import openai
 import os
 import json
-from flask_cors import CORS
+import re
+import time
 
-# os.environ["REQUESTS_CA_BUNDLE"] = 'C:\\Users\\antonije\\Downloads\\ITU_Root_Authority.crt'
-# os.environ["SSL_CERT_FILE"] = 'C:\\Users\\antonije\\Downloads\\ITU_Root_Authority.crt'
+os.environ["REQUESTS_CA_BUNDLE"] = 'C:\\Users\\antonije\\Downloads\\ITU_Root_Authority.crt'
+os.environ["SSL_CERT_FILE"] = 'C:\\Users\\antonije\\Downloads\\ITU_Root_Authority.crt'
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:63342"])
+CORS(app, origins="http://localhost:63342")
 
 os.environ["OPENAI_API_KEY"] = "023660028984431ba43b6df026a3170f"
 
@@ -31,12 +34,13 @@ def upload_file(action):
     save_path = os.path.join('./tmp', file.filename)
     file.save(save_path)
 
-    res_upload_clean = upload_clean(save_path)
-    res_clean_file = clean_file(res_upload_clean) #voir si il ne faut pas enlever le "res_upload_clean" afin de ne pas faire 2 requêtes
+
 
     if action == 'upload_clean':
+        res_upload_clean = upload_clean(save_path)
         return jsonify(response=res_upload_clean, status=200)
     elif action == 'clean_file':
+        res_clean_file = clean_file(save_path)
         return jsonify(response=res_clean_file, status=200)
     else:
         return "Action not found", 404
@@ -69,7 +73,7 @@ def upload_clean(file_path):
                 {
                     "role": "system",
                     "content": f"You are a professional terminologist. Your job is to extract important terms from a"
-                               f" given text. limit yourself to 7 terms per a given text"
+                               f" given text. limit yourself to 5 terms per a given text"
                                f"Make sure to return them as a list of terms without numbering them."
                 },
                 {
@@ -77,17 +81,18 @@ def upload_clean(file_path):
                     "content": chunk
                 }
             ],
-            temperature=0.6,
-            max_tokens=50,
+            temperature=0.7,
+            max_tokens=2000,
             top_p=0.95,
             frequency_penalty=0,
             presence_penalty=0,
             stop=None
         )
-
+        print(response.choices[0]['message']['content'].replace('\n', '').split('. ')[1:])
         cleaned_response = response.choices[0]['message']['content'].replace('\n', '').split('. ')[1:]
         cleaned_terms = [term.strip() for term in cleaned_response]
         gpt_responses.extend(cleaned_terms)
+        time.sleep(15)
     return gpt_responses
 
 
@@ -99,9 +104,8 @@ def clean_file(response):
             {
                 "role": "system",
                 "content": "You are a professional terminologist. Your job is to clean a list of terms keeping "
-                           "only essential and important terms from a given list of terms, limit yourself to 20 cleaned temrs"
+                           "only essential and important terms from a given list of terms, try to extract at least 20"
                            "Make sure to return them as json format {'cleaned_terms': [term1, term2 ...]} to be parsed"
-
             },
             {
                 "role": "user",
@@ -109,7 +113,7 @@ def clean_file(response):
             }
         ],
         temperature=0.7,
-        max_tokens=300,
+        max_tokens=1000,
         top_p=0.95,
         frequency_penalty=0,
         presence_penalty=0,
